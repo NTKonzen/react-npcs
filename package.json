@@ -8,7 +8,7 @@
     "start": "npm run start:dev",
     "start:dev": "concurrently \"npm:server\" \"npm:client\"",
     "client": "npm start --prefix client",
-    "server": "nodemon server.js",
+    "server": "nodemon server.js --ignore 'client/'",
     "watch": "nodemon server.js"
   },
   "author": "",
