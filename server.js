@@ -129,7 +129,17 @@ io.on('connection', (socket) => {
         });
 
         // i haven't done this yet lol
-        // socket.on('leave')
+        socket.on('leave', ({ room, username }) => {
+            const clientLeaving = clients[username.toLowerCase()];
+            console.log(`${username} left ${room}`);
+
+            // essentially the same as the join function above
+            if (!Object.keys(clients).includes(room.toLowerCase())) {
+                // make sure the message is emitted to the room before the user leaves or else they won't receive it
+                io.to(room).emit('leave', { room: room, userLeaving: username });
+                socket.leave(room);
+            }
+        })
 
         // Haven't set this up on the client side yet but this will work when i do
         socket.on('signup', ({ username }) => {

@@ -19,6 +19,9 @@ function Chat() {
             if (input.toLowerCase().startsWith('join')) {
                 // Example call: join room1
                 socket.emit('join', { room: message, username: Cookies.get('username') })
+            } else if (input.toLowerCase().startsWith('leave')) {
+                // Example call: leave room1
+                socket.emit('leave', { room: message, username: Cookies.get('username') })
             } else if (input.toLowerCase().startsWith('/w')) {
                 // Example call: /w Nick Hey!
                 const userTo = message.split(' ')[0];
@@ -40,6 +43,10 @@ function Chat() {
         setDisplays(displays.concat(<li key={room + userJoining + new Date().getTime()}>{userJoining} joined {room}</li>))
     });
 
+    socket.off('leave').on('leave', function ({ room, userLeaving }) {
+        setDisplays(displays.concat(<li key={room + userLeaving + new Date().getTime()}>{userLeaving} left {room}</li>))
+    });
+
     socket.off('chat message').on('chat message', function ({ username, message }) {
         console.log('chat message received!')
         setDisplays(displays.concat(<li key={username + message + new Date().getTime()}>{username}: {message}</li>))
@@ -51,7 +58,7 @@ function Chat() {
 
     socket.off('error').on('error', function ({ err }) {
         setDisplays(displays.concat(<li key={err + new Date().getTime()}>{err}</li>))
-    })
+    });
 
     function handleChange(e) {
         setInput(e.target.value);
@@ -59,10 +66,13 @@ function Chat() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        if (input.startsWith('join')) {
-            const room = input.split(' ').slice(1).join('');
+        if (input.toLowerCase().startsWith('join')) {
+            const room = input.split(' ').slice(1).join(' ');
             setMessage(room);
-        } else if (input.startsWith('/w')) {
+        } else if (input.toLowerCase().startsWith('leave')) {
+            const room = input.split(' ').slice(1).join(' ');
+            setMessage(room);
+        } else if (input.toLowerCase().startsWith('/w')) {
             const whisperMessage = input.split(' ').slice(1).join(' ');
             setMessage(whisperMessage);
         } else {
