@@ -40,7 +40,6 @@ app.get('*', (req, res) => {
     res.sendFile(__dirname + '/client/public/index.html')
 });
 
-
 const clients = new Object();
 
 io.on('connection', (socket) => {
@@ -71,7 +70,6 @@ io.on('connection', (socket) => {
                     toRoomArray.push(`.to('${room}')`)
                 })
                 toRoomArray.push(`.emit('chat message', {username, message});`);
-                console.log(toRoomArray.join(''))
                 return toRoomArray.join('')
             }
 
@@ -80,6 +78,8 @@ io.on('connection', (socket) => {
 
         socket.on('whisper', ({ userTo, message, username }) => {
             let clientTo = clients[userTo.toLowerCase()];
+
+            console.log(`${username} => ${userTo}: ${message}`)
 
             if (clientTo === undefined) {
                 io.to(username).emit('error', { err: `You can't whisper to somebody that doesn't exist!` })
@@ -94,7 +94,6 @@ io.on('connection', (socket) => {
         });
 
         socket.on('join', ({ room, username }) => {
-            console.log(`username:${username}`)
             const clientJoining = clients[username.toLowerCase()];
             clientJoining.chatRooms.push(room);
             console.log(`${username} joined ${room}`);
