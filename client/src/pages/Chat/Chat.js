@@ -49,6 +49,10 @@ function Chat() {
         setDisplays(displays.concat(<li key={username + message + new Date().getTime()}><i>{username}: {message}</i></li>))
     });
 
+    socket.off('error').on('error', function ({ err }) {
+        setDisplays(displays.concat(<li key={err + new Date().getTime()}>{err}</li>))
+    })
+
     function handleChange(e) {
         setInput(e.target.value);
     }

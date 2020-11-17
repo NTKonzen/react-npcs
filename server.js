@@ -68,8 +68,9 @@ io.on('connection', (socket) => {
 
         socket.on('disconnect', () => {
             console.log(`${username} disconnected`);
-            if (clients[username] !== undefined) {
-                clients[username].online = false;
+            if (clients[username.toLowerCase()] !== undefined) {
+                clients[username.toLowerCase()].online = false;
+                // console.log(clients[username.toLowerCase()])
             }
         });
 
@@ -98,8 +99,6 @@ io.on('connection', (socket) => {
         socket.on('whisper', ({ userTo, message, username }) => {
             let clientTo = clients[userTo.toLowerCase()];
 
-            console.log(`${username} => ${userTo}: ${message}`)
-
             if (clientTo === undefined) {
                 // if client doesn't exist
                 io.to(username).emit('error', { err: `You can't whisper to somebody that doesn't exist!` })
@@ -107,6 +106,7 @@ io.on('connection', (socket) => {
                 // if client is offline
                 io.to(username).emit('error', { err: `Looks like ${clientTo.username} is offline` })
             } else if (clientTo !== undefined) {
+                console.log(`${username} => ${userTo}: ${message}`)
                 // sends the message to the client that it was directed to and back to the client it was sent from
                 io.to(clientTo.username).to(username).emit('whisper', { message: message, username: username });
             }
