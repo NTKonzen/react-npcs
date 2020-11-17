@@ -32,8 +32,8 @@ function Chat() {
                 socket.emit('chat message', { username: Cookies.get('username'), message })
                 console.log('Log from useEffect')
             }
-            setMessage("")
-            setInput("")
+            setMessage("");
+            setInput("");
         }
     }, [message]);
 
