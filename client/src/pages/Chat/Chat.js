@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-// import io from "socket.io-client";
 import "./style.css";
+// Cookie plugin makes cookies easy
 import Cookies from 'js-cookie';
+// I had to create a separate socket file to avoid users connecting to multiple sockets
+// this ensures there is only one socket instance per client
 import { socket } from '../../utils/socket';
 
 function Chat() {
@@ -11,11 +13,14 @@ function Chat() {
 
     const [message, setMessage] = useState('');
 
+    // runs every time the message state is updated
     useEffect(() => {
         if (message !== '') {
-            if (input.startsWith('join')) {
+            if (input.toLowerCase().startsWith('join')) {
+                // Example call: join room1
                 socket.emit('join', { room: message, username: Cookies.get('username') })
-            } else if (input.startsWith('/w')) {
+            } else if (input.toLowerCase().startsWith('/w')) {
+                // Example call: /w Nick Hey!
                 const userTo = message.split(' ')[0];
                 const newMessage = message.split(' ').slice(1).join(' ');
 
@@ -29,7 +34,9 @@ function Chat() {
         }
     }, [message]);
 
+    // socket.off is required cause react is stupid don't ask
     socket.off('join').on('join', function ({ room, userJoining }) {
+        // keys are set via the time and received data to ensure that they're unique
         setDisplays(displays.concat(<li key={room + userJoining + new Date().getTime()}>{userJoining} joined {room}</li>))
     });
 
