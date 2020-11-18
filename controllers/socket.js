@@ -1,5 +1,176 @@
+const clientIO = require('socket.io-client')
+
+const serverClientSocket = clientIO("http://localhost:3001", {
+    withCredentials: true,
+    extraHeaders: {
+        "my-custom-header": "abcd"
+    },
+    query: { username: "Server" }
+});
+
 // Here I'm creating a client object that stores all the active clients on the server because I'm too lazy to set up a mongo database for this
 const clients = new Object();
+const NPCs = [
+    {
+        "names": ['ford', 'clerk', 'towel'],
+        "primaryName": "Ford",
+        id: 1,
+        messages: [
+            { // 0
+                message: 'Hi welcome to the Inn... what can I do for you I guess...',
+                exampleResponses: ["Where am I?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }]
+            },
+            { // 1
+                message: "Didn't I just tell you? You're in the Inn! It's just down the road from the Town and east of the Pumpkin Patch...",
+                exampleResponses: ["The Inn?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["who are you", "who are you?", "who"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }, {
+                    responses: ["the inn?", "the inn"],
+                    route: 3
+                }]
+            },
+            { // 2
+                message: "The name's Ford and despite my appearance, I'm actually just an intricately folded towel... don't ask",
+                exampleResponses: ["Where am I?", "You're a towel?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }, {
+                    responses: ["you're a towel?", "you're a towel", "youre a towel", "youre a towel?", "your a towel", "your a towel?", "a towel", "a towel?", "towel", "as a towel?", "as a towel"],
+                    route: 4
+                }]
+            },
+            { // 3
+                message: "You know, the Inn at the Edge of Copyright! The infinitely infamous pit stop where various travellers from around the universe take rest. Most of you I see only once and then you disappear beyond the crossroads. In fact, I’m the only one to have ever returned, as a towel no less!",
+                exampleResponses: ["You're a towel?", "Disappearances?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    responses: ["you're a towel?", "you're a towel", "youre a towel", "youre a towel?", "your a towel", "your a towel?", "a towel", "a towel?", "towel", "as a towel?", "as a towel"],
+                    route: 4
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }, {
+                    "responses": ["disappearances", "disappearances?", "disappear", "disappear?", "dissapearances", "dissapearances?", "dissapear", "dissapear?", "dissappearances", "dissappearances?", "dissappear", "dissappear?"],
+                    "route": 6
+                }]
+            },
+            { // 4
+                message: "Most of you don’t ask me that question thinking it rather rude… but between you and me I can not shake the experience of turning into this form. It happened just up there you know... *points to the sky and shudders*",
+                exampleResponses: ["Where am I?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }]
+            },
+            { // 5
+                message: "Before you leave, be sure to check your pockets.  The Infinite Improbability Drive from the Heart-of-Gold does strange things and you may have a helpful item in there, or just pocket lint.",
+                exampleResponses: ["Where am I?", "Who are you?"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }]
+            },
+            { // 6
+                message: "I dare not mention more, it brings back too many troubling memories…. Some fond ones sure, like Arthur and that magnificent invention called a sandwich… oh hey you’re a sandwich-maker. Can you make me a sandwich?",
+                exampleResponses: ["Here's your sandwich!", "No thanks"],
+                allowedResponses: [{
+                    "responses": ["here's your sandwich!", "heres your sandwich", "sandwich"],
+                    "route": 7
+                }, {
+                    "responses": ["no thanks"],
+                    "route": 8
+                }]
+            },
+            { // 7
+                message: "Such a Hoopy Frood you are!",
+                exampleResponses: ["Where am I?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }]
+            },
+            { // 8
+                message: "Oh well, maybe I can find Arthur and get one",
+                exampleResponses: ["Where am I?", "Who are you?", "Goodbye"],
+                allowedResponses: [{
+                    "responses": ["where am i", "where am i?"],
+                    "route": 1
+                }, {
+                    "responses": ["who are you", "who are you?"],
+                    "route": 2
+                }, {
+                    "responses": ["goodbye", "bye"],
+                    "route": 5
+                }]
+            },
+        ]
+    },
+]
+
+function checkIfStartsWithNPC(message) {
+    return new Promise((res, rej) => {
+        let startsWithNPC = false;
+        let NPCObj;
+
+        if (message.startsWith("the")) {
+            message = message.split(' ').slice(1).join(' ');
+        }
+
+        for (let i = 2; i >= 0; i--) {
+            const messageString = message.toLowerCase().split(' ').slice(0, i + 1).join(' ');
+            NPCs.forEach(NPC => {
+                if (NPC.names.includes(messageString)) {
+                    startsWithNPC = true;
+                    NPCObj = NPC;
+                    message = message.split(' ').slice(i + 1).join(' ');
+                }
+            })
+        }
+
+        if (startsWithNPC) {
+            res({ NPCObj, message })
+        } else {
+            rej({ status: 404, message: "Doesn't start with NPC" })
+        }
+    })
+
+}
 
 module.exports = function (io) {
     // This is called every time someone connects to the server
@@ -33,23 +204,37 @@ module.exports = function (io) {
             socket.on('chat message', ({ username, message }) => {
                 const fromClient = clients[username.toLowerCase()];
 
-                // this block of code essentially generated a string value of code that is then converted into javascript with the eval() function below
-                const toRoomString = () => {
-                    const toRoomArray = ['io'];
-                    fromClient.chatRooms.forEach(room => {
-                        // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
-                        // for example: 
-                        //      socket.to('room1').to('room2').emit('chat message') 
-                        // is better than 
-                        //      socket.to('room1').emit('chat message')
-                        //      socket.to('room2').emit('chat message')
-                        toRoomArray.push(`.to('${room}')`)
+                checkIfStartsWithNPC(message)
+                    .then(({ NPCObj, message }) => {
+                        serverClientSocket.emit('to npc', {
+                            messageFromUser: message,
+                            NPCObj,
+                            fromClient
+                        })
                     })
-                    toRoomArray.push(`.emit('chat message', {username, message});`);
-                    return toRoomArray.join('')
-                }
+                    .catch(err => {
+                        console.log(err.message)
 
-                eval(toRoomString());
+                        // this block of code essentially generated a string value of code that is then converted into javascript with the eval() function below
+                        const toRoomString = () => {
+                            const toRoomArray = ['io'];
+                            fromClient.chatRooms.forEach(room => {
+                                // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
+                                // for example: 
+                                //      socket.to('room1').to('room2').emit('chat message') 
+                                // is better than 
+                                //      socket.to('room1').emit('chat message')
+                                //      socket.to('room2').emit('chat message')
+                                toRoomArray.push(`.to('${room}')`)
+                            })
+                            toRoomArray.push(`.emit('chat message', {username, message});`);
+                            return toRoomArray.join('')
+                        }
+
+                        eval(toRoomString());
+                    })
+
+
             });
 
             socket.on('whisper', ({ userTo, message, username }) => {

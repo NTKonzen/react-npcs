@@ -15,7 +15,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "socket.io": "^3.0.1"
+    "socket.io": "^3.0.1",
+    "socket.io-client": "^3.0.2"
   },
   "devDependencies": {
     "concurrently": "^5.3.0",
