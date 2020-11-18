@@ -6,6 +6,16 @@ import Cookies from 'js-cookie';
 // this ensures there is only one socket instance per client
 import { socket } from '../../utils/socket';
 
+function thisStartsWithOneOfThese(string, array) {
+    let itDoes = false;
+    array.forEach(value => {
+        if (string.startsWith(value)) {
+            itDoes = true;
+        }
+    })
+    return itDoes;
+}
+
 function Chat() {
     const [input, setInput] = useState('');
 
@@ -16,13 +26,13 @@ function Chat() {
     // runs every time the message state is updated
     useEffect(() => {
         if (message !== '') {
-            if (input.toLowerCase().startsWith('join')) {
+            if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
                 // Example call: join room1
                 socket.emit('join', { room: message, username: Cookies.get('username') })
-            } else if (input.toLowerCase().startsWith('leave')) {
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
                 // Example call: leave room1
                 socket.emit('leave', { room: message, username: Cookies.get('username') })
-            } else if (input.toLowerCase().startsWith('/w')) {
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to'])) {
                 // Example call: /w Nick Hey!
                 const userTo = message.split(' ')[0];
                 const newMessage = message.split(' ').slice(1).join(' ');
@@ -66,14 +76,14 @@ function Chat() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        if (input.toLowerCase().startsWith('join')) {
+        if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
             const room = input.split(' ').slice(1).join(' ');
             setMessage(room);
-        } else if (input.toLowerCase().startsWith('leave')) {
+        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
             const room = input.split(' ').slice(1).join(' ');
             setMessage(room);
-        } else if (input.toLowerCase().startsWith('/w')) {
-            const whisperMessage = input.split(' ').slice(1).join(' ');
+        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to'])) {
+            const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
             setMessage(whisperMessage);
         } else {
             setMessage(input);
