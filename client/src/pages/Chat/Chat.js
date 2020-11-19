@@ -72,8 +72,12 @@ function Chat() {
         setDisplays(displays.concat(<li key={username + message + new Date().getTime()}><i>{username}: {message}</i></li>))
     });
 
-    socket.off('from NPC').on('from NPC', function ({ NPCName, NPCMessage, exampleResponses }) {
-        setConversation({ with: NPCName.toLowerCase() })
+    socket.off('from NPC').on('from NPC', function ({ NPCName, NPCMessage, exampleResponses, leavingConversation }) {
+        if (!leavingConversation) {
+            setConversation({ with: NPCName.toLowerCase() })
+        } else {
+            setConversation(false)
+        }
         setDisplays(displays.concat([
             <li key={NPCName + NPCMessage + new Date().getTime()}><b>{NPCName}: {NPCMessage}</b></li>,
             <li key={exampleResponses + new Date().getTime()}>Allowed Responses: {exampleResponses}</li>
@@ -91,12 +95,8 @@ function Chat() {
     function handleSubmit(e) {
         e.preventDefault();
         if (inConversation) {
-            if (thisStartsWithOneOfThese(input.toLowerCase(), ['bye', 'goodbye', 'adios', 'leave'])) {
-                setConversation(false);
-            } else {
-                socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
-                setInput('')
-            }
+            socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
+            setInput('')
         } else {
             if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
                 const room = input.split(' ').slice(1).join(' ');

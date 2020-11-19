@@ -8,7 +8,8 @@ function thisStartsWithOneOfThese(string, array) {
     return itDoes;
 }
 
-let greetingsArray = ['hello', 'hi', 'hey', 'hello?']
+let greetingsArray = ['hello', 'hi', 'hey', 'hello?'];
+let goodbyeArray = ['goodbye', 'bye', 'adios', 'leave'];
 
 module.exports = function (io) {
     io.on('connection', socket => {
@@ -17,6 +18,11 @@ module.exports = function (io) {
             let route;
             let exampleResponses;
             let NPCMessage;
+            let leavingConversation = false;
+
+            if (thisStartsWithOneOfThese(messageFromUser.toLowerCase(), goodbyeArray)) {
+                leavingConversation = true
+            }
 
             if (messageFromUser.trim() === '' || !messageFromUser || thisStartsWithOneOfThese(messageFromUser.toLowerCase(), greetingsArray)) {
                 route = 0;
@@ -35,7 +41,7 @@ module.exports = function (io) {
             }
 
             // console.log(`${npc}: ${message}`);
-            io.to(fromClient.username).emit('from NPC', { NPCName: NPCObj.primaryName, NPCMessage, exampleResponses: exampleResponses.join(', ') });
+            io.to(fromClient.username).emit('from NPC', { NPCName: NPCObj.primaryName, NPCMessage, exampleResponses: exampleResponses.join(', '), leavingConversation });
         })
     })
 }
