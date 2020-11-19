@@ -23,10 +23,7 @@ function Chat() {
 
     const [message, setMessage] = useState('');
 
-    const [conversation, setConversation] = useState({
-        inConversation: false,
-        with: undefined
-    });
+    const [inConversation, setConversation] = useState(false);
 
     // runs every time the message state is updated
     useEffect(() => {
@@ -37,7 +34,7 @@ function Chat() {
             } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
                 // Example call: leave room1
                 socket.emit('leave', { room: message, username: Cookies.get('username') })
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to'])) {
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
                 // Example call: /w Nick Hey!
                 const userTo = message.split(' ')[0];
                 const newMessage = message.split(' ').slice(1).join(' ');
@@ -51,6 +48,10 @@ function Chat() {
             setInput("");
         }
     }, [message]);
+
+    useEffect(() => {
+        console.log(inConversation)
+    }, [inConversation])
 
     // socket.off is required cause react is stupid don't ask
     socket.off('join').on('join', function ({ room, userJoining }) {
@@ -72,6 +73,7 @@ function Chat() {
     });
 
     socket.off('from NPC').on('from NPC', function ({ NPCName, NPCMessage, exampleResponses }) {
+        setConversation({ with: NPCName.toLowerCase() })
         setDisplays(displays.concat([
             <li key={NPCName + NPCMessage + new Date().getTime()}><b>{NPCName}: {NPCMessage}</b></li>,
             <li key={exampleResponses + new Date().getTime()}>Allowed Responses: {exampleResponses}</li>
@@ -88,18 +90,26 @@ function Chat() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
-            const room = input.split(' ').slice(1).join(' ');
-            setMessage(room);
-        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
-            const room = input.split(' ').slice(1).join(' ');
-            setMessage(room);
-        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
-            const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
-            console.log(whisperMessage)
-            setMessage(whisperMessage);
+        if (inConversation) {
+            if (thisStartsWithOneOfThese(input.toLowerCase(), ['bye', 'goodbye', 'adios', 'leave'])) {
+                setConversation(false);
+            } else {
+                socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
+                setInput('')
+            }
         } else {
-            setMessage(input);
+            if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
+                const room = input.split(' ').slice(1).join(' ');
+                setMessage(room);
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
+                const room = input.split(' ').slice(1).join(' ');
+                setMessage(room);
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
+                const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
+                setMessage(whisperMessage);
+            } else {
+                setMessage(input);
+            }
         }
     }
 
