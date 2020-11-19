@@ -149,9 +149,11 @@ function checkIfStartsWithNPC(message) {
         let NPCObj;
 
         if (message.startsWith("the")) {
+            // removes the
             message = message.split(' ').slice(1).join(' ');
         }
 
+        // This runs three times!
         for (let i = 2; i >= 0; i--) {
             const messageString = message.toLowerCase().split(' ').slice(0, i + 1).join(' ');
             NPCs.forEach(NPC => {
@@ -246,15 +248,21 @@ module.exports = function (io) {
 
                 checkIfStartsWithNPC(`${userTo} ${message}`)
                     .then(({ NPCObj, message }) => {
+                        // This next block is in charge of muting all of the active rooms that the client is a part of while they are in a conversation with an NPC
                         fromClient.chatRooms.forEach(room => {
+                            // this allows the client to still receive whispers
                             if (room !== fromClient.username) {
+                                // this next block checks if the user has indicated they are leaving the conversation
                                 if (!thisStartsWithOneOfThese(message.toLowerCase(), goodbyeArray)) {
+                                    // the client will leave every chat room they are a part of
                                     socket.leave(room)
                                 } else {
+                                    // the client will re-join every chat room they are a part of
                                     socket.join(room)
                                 }
                             }
                         })
+                        // this is sent to the NPCEngine
                         serverClientSocket.emit('to NPC', {
                             messageFromUser: message,
                             NPCObj,
