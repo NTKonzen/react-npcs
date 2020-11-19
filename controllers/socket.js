@@ -188,7 +188,7 @@ module.exports = function (io) {
                 // Used in socket.on('whisper')
                 online: true,
                 // User in socket.on('chat message')
-                chatRooms: [username]
+                chatRooms: []
             };
             console.log(`${username} connected`);
             socket.join(username);
@@ -204,53 +204,62 @@ module.exports = function (io) {
             socket.on('chat message', ({ username, message }) => {
                 const fromClient = clients[username.toLowerCase()];
 
-                checkIfStartsWithNPC(message)
-                    .then(({ NPCObj, message }) => {
-                        serverClientSocket.emit('to npc', {
-                            messageFromUser: message,
-                            NPCObj,
-                            fromClient
+                if (fromClient.chatRooms.length == 0) {
+                    io.to(fromClient.username).emit('error', { err: `You haven't joined any rooms!` })
+                } else {
+                    // this block of code essentially generated a string value of code that is then converted into javascript with the eval() function below
+                    const toRoomString = () => {
+                        const toRoomArray = ['io'];
+                        fromClient.chatRooms.forEach(room => {
+                            // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
+                            // for example: 
+                            //      socket.to('room1').to('room2').emit('chat message') 
+                            // is better than 
+                            //      socket.to('room1').emit('chat message')
+                            //      socket.to('room2').emit('chat message')
+                            toRoomArray.push(`.to('${room}')`)
                         })
-                    })
-                    .catch(err => {
-                        console.log(err.message)
+                        toRoomArray.push(`.emit('chat message', {username, message});`);
+                        return toRoomArray.join('')
+                    }
 
-                        // this block of code essentially generated a string value of code that is then converted into javascript with the eval() function below
-                        const toRoomString = () => {
-                            const toRoomArray = ['io'];
-                            fromClient.chatRooms.forEach(room => {
-                                // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
-                                // for example: 
-                                //      socket.to('room1').to('room2').emit('chat message') 
-                                // is better than 
-                                //      socket.to('room1').emit('chat message')
-                                //      socket.to('room2').emit('chat message')
-                                toRoomArray.push(`.to('${room}')`)
-                            })
-                            toRoomArray.push(`.emit('chat message', {username, message});`);
-                            return toRoomArray.join('')
-                        }
-
-                        eval(toRoomString());
-                    })
+                    eval(toRoomString());
+                }
 
 
             });
 
             socket.on('whisper', ({ userTo, message, username }) => {
                 let clientTo = clients[userTo.toLowerCase()];
+                let fromClient = clients[username.toLowerCase()];
 
-                if (clientTo === undefined) {
-                    // if client doesn't exist
-                    io.to(username).emit('error', { err: `You can't whisper to somebody that doesn't exist!` })
-                } else if (!clientTo.online) {
-                    // if client is offline
-                    io.to(username).emit('error', { err: `Looks like ${clientTo.username} is offline` })
-                } else if (clientTo !== undefined) {
-                    console.log(`${username} => ${userTo}: ${message}`)
-                    // sends the message to the client that it was directed to and back to the client it was sent from
-                    io.to(clientTo.username).to(username).emit('whisper', { message: message, username: username });
-                }
+                checkIfStartsWithNPC(`${userTo} ${message}`)
+                    .then(({ NPCObj, message }) => {
+
+
+
+                        serverClientSocket.emit('to npc', {
+                            messageFromUser: message,
+                            NPCObj,
+                            fromClient
+                        })
+                    })
+                    .catch((err) => {
+                        console.log(err.message)
+
+                        if (clientTo === undefined) {
+                            // if client doesn't exist
+                            io.to(username).emit('error', { err: `You can't whisper to somebody that doesn't exist!` })
+                        } else if (!clientTo.online) {
+                            // if client is offline
+                            io.to(username).emit('error', { err: `Looks like ${clientTo.username} is offline` })
+                        } else if (clientTo !== undefined) {
+                            console.log(`${username} => ${userTo}: ${message}`)
+                            // sends the message to the client that it was directed to and back to the client it was sent from
+                            io.to(clientTo.username).to(username).emit('whisper', { message: message, username: username });
+                        }
+                    })
+
 
             });
 
@@ -278,6 +287,8 @@ module.exports = function (io) {
                 if (!Object.keys(clients).includes(room.toLowerCase())) {
                     // make sure the message is emitted to the room before the user leaves or else they won't receive it
                     io.to(room).emit('leave', { room: room, userLeaving: username });
+                    const chatRoomIndex = clientLeaving.chatRooms.indexOf(room);
+                    clientLeaving.chatRooms.splice(chatRoomIndex)
                     socket.leave(room);
                 }
             })

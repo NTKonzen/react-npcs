@@ -1,3 +1,15 @@
+function thisStartsWithOneOfThese(string, array) {
+    let itDoes = false;
+    array.forEach(value => {
+        if (string.startsWith(value)) {
+            itDoes = true;
+        }
+    })
+    return itDoes;
+}
+
+let greetingsArray = ['hello', 'hi', 'hey', 'hello?']
+
 module.exports = function (io) {
     io.on('connection', socket => {
         socket.on('to npc', ({ NPCObj, messageFromUser, fromClient }) => {
@@ -6,7 +18,7 @@ module.exports = function (io) {
             let exampleResponses;
             let NPCMessage;
 
-            if (messageFromUser.trim() === '' || !messageFromUser) {
+            if (messageFromUser.trim() === '' || !messageFromUser || thisStartsWithOneOfThese(messageFromUser.toLowerCase(), greetingsArray)) {
                 route = 0;
                 NPCMessage = NPCObj.messages[0].message;
                 exampleResponses = NPCObj.messages[0].exampleResponses;

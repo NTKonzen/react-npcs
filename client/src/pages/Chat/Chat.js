@@ -82,8 +82,9 @@ function Chat() {
         } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
             const room = input.split(' ').slice(1).join(' ');
             setMessage(room);
-        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to'])) {
-            const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
+        } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
+            const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
+            console.log(whisperMessage)
             setMessage(whisperMessage);
         } else {
             setMessage(input);
