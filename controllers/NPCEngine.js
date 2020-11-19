@@ -12,7 +12,7 @@ let greetingsArray = ['hello', 'hi', 'hey', 'hello?']
 
 module.exports = function (io) {
     io.on('connection', socket => {
-        socket.on('to npc', ({ NPCObj, messageFromUser, fromClient }) => {
+        socket.on('to NPC', ({ NPCObj, messageFromUser, fromClient }) => {
 
             let route;
             let exampleResponses;
@@ -35,8 +35,7 @@ module.exports = function (io) {
             }
 
             // console.log(`${npc}: ${message}`);
-            io.to(fromClient.username).emit('error', { err: `${NPCObj.primaryName}: ${NPCMessage}` });
-            io.to(fromClient.username).emit('error', { err: `Allowed Responses: ${exampleResponses.join(', ')}` })
+            io.to(fromClient.username).emit('from NPC', { NPCName: NPCObj.primaryName, NPCMessage, exampleResponses: exampleResponses.join(', ') });
         })
     })
 }

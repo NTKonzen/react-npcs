@@ -23,6 +23,11 @@ function Chat() {
 
     const [message, setMessage] = useState('');
 
+    const [conversation, setConversation] = useState({
+        inConversation: false,
+        with: undefined
+    });
+
     // runs every time the message state is updated
     useEffect(() => {
         if (message !== '') {
@@ -66,13 +71,20 @@ function Chat() {
         setDisplays(displays.concat(<li key={username + message + new Date().getTime()}><i>{username}: {message}</i></li>))
     });
 
+    socket.off('from NPC').on('from NPC', function ({ NPCName, NPCMessage, exampleResponses }) {
+        setDisplays(displays.concat([
+            <li key={NPCName + NPCMessage + new Date().getTime()}><b>{NPCName}: {NPCMessage}</b></li>,
+            <li key={exampleResponses + new Date().getTime()}>Allowed Responses: {exampleResponses}</li>
+        ]));
+    })
+
     socket.off('error').on('error', function ({ err }) {
         setDisplays(displays.concat(<li key={err + new Date().getTime()}>{err}</li>))
     });
 
     function handleChange(e) {
         setInput(e.target.value);
-    }
+    };
 
     function handleSubmit(e) {
         e.preventDefault();

@@ -235,10 +235,7 @@ module.exports = function (io) {
 
                 checkIfStartsWithNPC(`${userTo} ${message}`)
                     .then(({ NPCObj, message }) => {
-
-
-
-                        serverClientSocket.emit('to npc', {
+                        serverClientSocket.emit('to NPC', {
                             messageFromUser: message,
                             NPCObj,
                             fromClient
