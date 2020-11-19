@@ -172,6 +172,16 @@ function checkIfStartsWithNPC(message) {
 
 }
 
+function thisStartsWithOneOfThese(string, array) {
+    let itDoes = false;
+    array.forEach(value => {
+        if (string.startsWith(value)) {
+            itDoes = true;
+        }
+    })
+    return itDoes;
+}
+
 module.exports = function (io) {
     // This is called every time someone connects to the server
     io.on('connection', (socket) => {
@@ -232,18 +242,17 @@ module.exports = function (io) {
             socket.on('whisper', ({ userTo, message, username }) => {
                 let clientTo = clients[userTo.toLowerCase()];
                 let fromClient = clients[username.toLowerCase()];
+                let goodbyeArray = ['goodbye', 'bye', 'adios', 'leave'];
 
                 checkIfStartsWithNPC(`${userTo} ${message}`)
                     .then(({ NPCObj, message }) => {
                         fromClient.chatRooms.forEach(room => {
-                            // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
-                            // for example: 
-                            //      socket.to('room1').to('room2').emit('chat message') 
-                            // is better than 
-                            //      socket.to('room1').emit('chat message')
-                            //      socket.to('room2').emit('chat message')
                             if (room !== fromClient.username) {
-                                socket.leave(room)
+                                if (!thisStartsWithOneOfThese(message.toLowerCase(), goodbyeArray)) {
+                                    socket.leave(room)
+                                } else {
+                                    socket.join(room)
+                                }
                             }
                         })
                         serverClientSocket.emit('to NPC', {
