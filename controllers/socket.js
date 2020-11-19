@@ -235,6 +235,17 @@ module.exports = function (io) {
 
                 checkIfStartsWithNPC(`${userTo} ${message}`)
                     .then(({ NPCObj, message }) => {
+                        fromClient.chatRooms.forEach(room => {
+                            // If you daisy chain .to() in a single .emit() it prevents the client from receiving the .emit() multiple times if they are in multiple rooms
+                            // for example: 
+                            //      socket.to('room1').to('room2').emit('chat message') 
+                            // is better than 
+                            //      socket.to('room1').emit('chat message')
+                            //      socket.to('room2').emit('chat message')
+                            if (room !== fromClient.username) {
+                                socket.leave(room)
+                            }
+                        })
                         serverClientSocket.emit('to NPC', {
                             messageFromUser: message,
                             NPCObj,
