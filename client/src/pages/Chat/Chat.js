@@ -43,7 +43,6 @@ function Chat() {
             } else {
                 // if the inputted string doesn't start with a recognized command, this runs by default
                 socket.emit('chat message', { username: Cookies.get('username'), message })
-                console.log('Log from useEffect')
             }
             setMessage("");
             setInput("");
