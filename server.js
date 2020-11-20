@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3001;
 
 // Routes the user to the React html
 app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/client/public/index.html')
+    res.sendFile(__dirname + '/client/build/index.html')
 });
 
 server.listen(PORT, () => {
