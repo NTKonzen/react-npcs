@@ -11,7 +11,7 @@ const socketConnections = require('./controllers/socket')(io);
 const PORT = process.env.PORT || 3001;
 console.log("process.env inside server.js: ", process.env);
 
-if (process.env.PUBLIC_URL === '') {
+if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
     if (process.env.NODE_ENV === 'development') {
         app.get('*', (req, res) => {
             res.sendFile(path.join(__dirname, '/client/public/index.html'))
