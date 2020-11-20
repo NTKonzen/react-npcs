@@ -14,7 +14,9 @@ if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
     connectionString = process.env.PUBLIC_URL;
 }
 
-const serverClientSocket = clientIO(`${connectionString}`, {
+console.log("connectionString in root/socket.js: ", connectionString)
+
+const serverClientSocket = clientIO(connectionString, {
     withCredentials: true,
     extraHeaders: {
         "my-custom-header": "abcd"
