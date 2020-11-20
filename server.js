@@ -10,13 +10,24 @@ const socketConnections = require('./controllers/socket')(io);
 
 const PORT = process.env.PORT || 3001;
 
-app.use(express.static(path.join(__dirname + '/client/build/')))
+if (process.env.NODE_ENV === 'development') {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '/client/public/index.html'))
+    })
 
-// Routes the user to the React html
-app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/client/build/index.html')
-});
+    server.listen(PORT, () => {
+        console.log('Server listening on http://localhost:' + PORT);
+    });
+} else if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname + '/client/build/')))
 
-server.listen(PORT, () => {
-    console.log('listening on http://localhost:' + PORT);
-}); 
+    // Routes the user to the React html
+    app.get('*', (req, res) => {
+        res.sendFile(__dirname + '/client/build/index.html')
+    });
+
+    server.listen(PORT, () => {
+        console.log('Server listening on nicksnpcs.herokuapp.com:' + PORT);
+    });
+}
+
