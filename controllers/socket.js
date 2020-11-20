@@ -2,10 +2,14 @@ const clientIO = require('socket.io-client')
 
 let connectionString;
 
-if (process.env.NODE_ENV === 'production') {
-    connectionString = `nicksnpcs.herokuapp.com`
-} else if (process.env.NODE_ENV === 'development') {
-    connectionString = "http://localhost:3001"
+if (!process.env.TEST_URL) {
+    if (process.env.NODE_ENV === 'production') {
+        connectionString = `nicksnpcs.herokuapp.com`
+    } else if (process.env.NODE_ENV === 'development') {
+        connectionString = "http://localhost:3001"
+    }
+} else {
+    connectionString = process.env.TEST_URL;
 }
 
 const serverClientSocket = clientIO(connectionString, {

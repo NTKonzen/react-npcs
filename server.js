@@ -9,6 +9,7 @@ const NPCEngine = require('./controllers/NPCEngine')(io);
 const socketConnections = require('./controllers/socket')(io);
 
 const PORT = process.env.PORT || 3001;
+console.log(process.env.TEST_URL);
 
 if (process.env.NODE_ENV === 'development') {
     app.get('*', (req, res) => {
