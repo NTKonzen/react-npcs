@@ -33,7 +33,7 @@ function Chat() {
             } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
                 // Example call: leave room1
                 socket.emit('leave', { room: message, username: Cookies.get('username') })
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to', 'talk to'])) {
                 // Example call: /w Nick Hey!
                 const userTo = message.split(' ')[0];
                 const newMessage = message.split(' ').slice(1).join(' ');
@@ -89,7 +89,7 @@ function Chat() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        if (inConversation && !thisStartsWithOneOfThese(input.toLowerCase(), ['/w', 'whisper', 'say to', 'speak to'])) {
+        if (inConversation && !thisStartsWithOneOfThese(input.toLowerCase(), ['/w', 'whisper', 'say to', 'speak to', 'talk to'])) {
             // if the user is in a conversation with an NPC, emit to the server
             socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
             setInput('')
@@ -101,9 +101,9 @@ function Chat() {
             } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
                 const room = input.split(' ').slice(1).join(' ');
                 setMessage(room);
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to'])) {
+            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to', 'talk to'])) {
                 // handles if the user is using the extended whisper command with 'to'
-                const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
+                const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to', 'talk to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
                 setMessage(whisperMessage);
             } else {
                 setMessage(input);
