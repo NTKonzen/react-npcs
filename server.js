@@ -9,7 +9,7 @@ const NPCEngine = require('./controllers/NPCEngine')(io);
 const socketConnections = require('./controllers/socket')(io);
 
 const PORT = process.env.PORT || 3001;
-console.log(process.env.PUBLIC_URL);
+console.log("process.env inside server.js: ", process.env);
 
 if (process.env.PUBLIC_URL === '') {
     if (process.env.NODE_ENV === 'development') {

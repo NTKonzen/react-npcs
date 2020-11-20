@@ -2,6 +2,8 @@ const clientIO = require('socket.io-client')
 
 let connectionString;
 
+console.log("process.env inside root/socket.js:", process.env)
+
 if (process.env.PUBLIC_URL === '') {
     if (process.env.NODE_ENV === 'production') {
         connectionString = `nicksnpcs.herokuapp.com`
