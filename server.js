@@ -7,11 +7,13 @@ const NPCEngine = require('./controllers/NPCEngine')(io);
 
 const socketConnections = require('./controllers/socket')(io);
 
+const PORT = process.env.PORT || 3001;
+
 // Routes the user to the React html
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/client/public/index.html')
 });
 
-server.listen(3001, () => {
-    console.log('listening on http://localhost:3001');
+server.listen(PORT, () => {
+    console.log('listening on http://localhost:' + PORT);
 }); 
