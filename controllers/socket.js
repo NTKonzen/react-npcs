@@ -2,7 +2,7 @@ const clientIO = require('socket.io-client')
 
 let connectionString;
 
-console.log("process.env inside root/socket.js:", process.env)
+console.log("process.env.PUBLIC_URL inside root/socket.js:", process.env.PUBLIC_URL)
 
 if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
     if (process.env.NODE_ENV === 'production') {
@@ -14,7 +14,7 @@ if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
     connectionString = process.env.PUBLIC_URL;
 }
 
-const serverClientSocket = clientIO(connectionString, {
+const serverClientSocket = clientIO(`${connectionString}`, {
     withCredentials: true,
     extraHeaders: {
         "my-custom-header": "abcd"
