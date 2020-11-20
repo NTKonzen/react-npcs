@@ -4,7 +4,7 @@ import "./style.css";
 import Cookies from 'js-cookie';
 // I had to create a separate socket file to avoid users connecting to multiple sockets
 // this ensures there is only one socket instance per client
-import { socket } from '../../utils/socket';
+import socket from '../../utils/socket';
 
 function thisStartsWithOneOfThese(string, array) {
     let itDoes = false;
@@ -15,7 +15,6 @@ function thisStartsWithOneOfThese(string, array) {
     })
     return itDoes;
 }
-
 function Chat() {
     const [input, setInput] = useState('');
 

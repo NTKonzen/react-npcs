@@ -15,10 +15,18 @@ if (process.env.PUBLIC_URL === '') {
 
 console.log("connection string:", connectionString)
 
-export const socket = io(connectionString, {
-    withCredentials: true,
-    extraHeaders: {
-        "my-custom-header": "abcd"
-    },
-    query: { username: Cookies.get('username') }
-});
+let socket;
+
+if (Cookies.get('username')) {
+    socket = io(connectionString, {
+        withCredentials: true,
+        extraHeaders: {
+            "my-custom-header": "abcd"
+        },
+        query: { username: Cookies.get('username') }
+    });
+} else {
+    socket = false
+}
+
+export default socket;
