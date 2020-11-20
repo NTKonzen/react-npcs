@@ -6,7 +6,7 @@ console.log("process.env.PUBLIC_URL inside root/socket.js:", process.env.PUBLIC_
 
 if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
     if (process.env.NODE_ENV === 'production') {
-        connectionString = `nicksnpcs.herokuapp.com`
+        connectionString = `nicksnpcs.herokuapp.com:${process.env.PORT}`
     } else if (process.env.NODE_ENV === 'development') {
         connectionString = "http://localhost:3001"
     }
