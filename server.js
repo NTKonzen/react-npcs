@@ -1,4 +1,5 @@
-const express = require('express')
+const express = require('express');
+const path = require('path');
 var app = require('express')();
 var server = require('http').createServer(app);
 const io = require('./config/io-config')(server);
@@ -9,7 +10,7 @@ const socketConnections = require('./controllers/socket')(io);
 
 const PORT = process.env.PORT || 3001;
 
-app.use(express.static(path.join(__dirname + '/client/build/index.html')))
+app.use(express.static(path.join(__dirname + '/client/build/')))
 
 // Routes the user to the React html
 app.get('*', (req, res) => {
