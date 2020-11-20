@@ -11,7 +11,7 @@
     "client": "npm start --prefix client",
     "server": "nodemon server.js --ignore 'client/'",
     "watch": "nodemon server.js",
-    "install": "npm install && cd client && npm install",
+    "install": "cd client && npm install",
     "build": "cd client && npm run build",
     "heroku-postbuild": "cd client && npm install && npm run build"
   },
