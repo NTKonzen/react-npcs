@@ -7,7 +7,7 @@ console.log(process.env)
 
 if (process.env.PUBLIC_URL === '') {
     if (process.env.NODE_ENV === 'production') {
-        connectionString = `nicksnpcs.herokuapp.com`
+        connectionString = `https://nicksnpcs.herokuapp.com`
     } else if (process.env.NODE_ENV === 'development') {
         connectionString = "http://localhost:3001"
     }
