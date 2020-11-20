@@ -9,6 +9,8 @@ const socketConnections = require('./controllers/socket')(io);
 
 const PORT = process.env.PORT || 3001;
 
+app.use(express.static(path.join(__dirname + '/client/build/index.html')))
+
 // Routes the user to the React html
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/client/build/index.html')
