@@ -1,28 +1,29 @@
-const clientIO = require('socket.io-client')
+// const clientIO = require('socket.io-client')
+const handleNPCs = require('../controllers/NPCEngine');
 
-let connectionString;
+// let connectionString;
 
-console.log("process.env.PUBLIC_URL inside root/socket.js:", process.env.PUBLIC_URL)
+// console.log("process.env.PUBLIC_URL inside root/socket.js:", process.env.PUBLIC_URL)
 
-if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
-    if (process.env.NODE_ENV === 'production') {
-        connectionString = `https://nicksnpcs.herokuapp.com:${process.env.PORT}`
-    } else if (process.env.NODE_ENV === 'development') {
-        connectionString = "http://localhost:3001"
-    }
-} else {
-    connectionString = process.env.PUBLIC_URL;
-}
+// if (process.env.PUBLIC_URL === '' || !process.env.PUBLIC_URL) {
+//     if (process.env.NODE_ENV === 'production') {
+//         connectionString = `https://nicksnpcs.herokuapp.com:${process.env.PORT}`
+//     } else if (process.env.NODE_ENV === 'development') {
+//         connectionString = "http://localhost:3001"
+//     }
+// } else {
+//     connectionString = process.env.PUBLIC_URL;
+// }
 
-console.log("connectionString in root/socket.js: ", connectionString)
+// console.log("connectionString in root/socket.js: ", connectionString)
 
-const serverClientSocket = clientIO(connectionString, {
-    withCredentials: true,
-    extraHeaders: {
-        "my-custom-header": "abcd"
-    },
-    query: { username: "Server" }
-});
+// const serverClientSocket = clientIO(connectionString, {
+//     withCredentials: true,
+//     extraHeaders: {
+//         "my-custom-header": "abcd"
+//     },
+//     query: { username: "Server" }
+// });
 
 // Here I'm creating a client object that stores all the active clients on the server because I'm too lazy to set up a mongo database for this
 const clients = new Object();
@@ -279,7 +280,7 @@ module.exports = function (io) {
                             }
                         })
                         // this is sent to the NPCEngine
-                        serverClientSocket.emit('to NPC', {
+                        handleNPCs(io, {
                             messageFromUser: message,
                             NPCObj,
                             fromClient

@@ -3,8 +3,8 @@ const path = require('path');
 var app = require('express')();
 var server = require('http').createServer(app);
 const io = require('./config/io-config')(server);
-const backEngine = require('./controllers/backEngine')(io);
-const NPCEngine = require('./controllers/NPCEngine')(io);
+// const backEngine = require('./controllers/backEngine')(io);
+// const NPCEngine = require('./controllers/NPCEngine')(io);
 
 const socketConnections = require('./controllers/socket')(io);
 

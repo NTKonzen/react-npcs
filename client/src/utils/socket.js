@@ -3,8 +3,6 @@ import Cookies from "js-cookie";
 
 let connectionString;
 
-console.log(process.env)
-
 if (process.env.PUBLIC_URL === '') {
     if (process.env.NODE_ENV === 'production') {
         connectionString = `https://nicksnpcs.herokuapp.com`
@@ -14,6 +12,8 @@ if (process.env.PUBLIC_URL === '') {
 } else {
     connectionString = process.env.PUBLIC_URL;
 }
+
+console.log("connection string:", connectionString)
 
 export const socket = io(connectionString, {
     withCredentials: true,
