@@ -91,7 +91,7 @@ function Chat() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        if (inConversation) {
+        if (inConversation && !thisStartsWithOneOfThese(input.toLowerCase(), ['/w', 'whisper', 'say to', 'speak to'])) {
             // if the user is in a conversation with an NPC, emit to the server
             socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
             setInput('')

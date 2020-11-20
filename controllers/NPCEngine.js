@@ -46,8 +46,22 @@ module.exports = function (io) {
                 })
             }
 
-            // emits all the necessary info to the user
-            io.to(fromClient.username).emit('from NPC', { NPCName: NPCObj.primaryName, NPCMessage, exampleResponses: exampleResponses.join(', '), leavingConversation });
+            if (route !== undefined) {
+                // emits all the necessary info to the user
+                io.to(fromClient.username).emit('from NPC', {
+                    NPCName: NPCObj.primaryName,
+                    NPCMessage,
+                    exampleResponses: exampleResponses.join(', '),
+                    leavingConversation
+                });
+            } else {
+                io.to(fromClient.username).emit('from NPC', {
+                    NPCName: NPCObj.primaryName,
+                    NPCMessage: "Hm... I didn't understand that",
+                    exampleResponses: NPCObj.messages[0].exampleResponses.join(', '),
+                    leavingConversation
+                })
+            }
         })
     })
 }
