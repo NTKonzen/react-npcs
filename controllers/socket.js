@@ -137,7 +137,7 @@ const NPCs = [
     },
 ]
 
-function checkIfStartsWithNPC(message) {
+function checkIfStartsWithNPC(message, rooms) {
     return new Promise((res, rej) => {
         let startsWithNPC = false;
         let NPCObj;
@@ -159,10 +159,12 @@ function checkIfStartsWithNPC(message) {
             })
         }
 
-        if (startsWithNPC) {
+        if (startsWithNPC && thisStartsWithOneOfThese(NPCObj.inRoom, rooms)) {
             res({ NPCObj, message })
+        } else if (startsWithNPC && !thisStartsWithOneOfThese(NPCObj.inRoom, rooms)) {
+            rej({ status: 404, message: '' })
         } else {
-            rej({ status: 404, message: "Doesn't start with NPC" })
+            rej({ status: 204, message: "Doesn't start with NPC" })
         }
     })
 
@@ -240,7 +242,7 @@ module.exports = function (io) {
                 let fromClient = clients[username.toLowerCase()];
                 let goodbyeArray = ['goodbye', 'bye', 'adios', 'leave'];
 
-                checkIfStartsWithNPC(`${userTo} ${message}`)
+                checkIfStartsWithNPC(`${userTo} ${message}`, rooms)
                     .then(({ NPCObj, message }) => {
                         // This next block is in charge of muting all of the active rooms that the client is a part of while they are in a conversation with an NPC
                         fromClient.chatRooms.forEach(room => {
@@ -269,7 +271,7 @@ module.exports = function (io) {
 
                         if (clientTo === undefined) {
                             // if client doesn't exist
-                            io.to(username).emit('error', { err: `You can't whisper to somebody that doesn't exist!` })
+                            io.to(username).emit('error', { err: `There's nobody by that name in this room` })
                         } else if (!clientTo.online) {
                             // if client is offline
                             io.to(username).emit('error', { err: `Looks like ${clientTo.username} is offline` })
