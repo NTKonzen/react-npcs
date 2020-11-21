@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/Input/Input"
 import Chat from "../../components/Chat/Chat"
 import "./style.css";
@@ -15,6 +15,12 @@ function Play() {
 
     const [inConversation, setConversation] = useState(false);
 
+    const [rooms, setRooms] = useState([])
+
+    useEffect(() => {
+        console.log(rooms)
+    }, [rooms])
+
     return (<div>
         <Chat
             socket={socket}
@@ -26,6 +32,8 @@ function Play() {
             setInput={setInput}
             message={message}
             setMessage={setMessage}
+            rooms={rooms}
+            setRooms={setRooms}
         >
         </Chat>
         <Input
@@ -34,6 +42,8 @@ function Play() {
             inConversation={inConversation}
             input={input}
             setInput={setInput}
+            rooms={rooms}
+            setRooms={setRooms}
         ></Input>
     </div>
     )

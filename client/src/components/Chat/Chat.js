@@ -4,7 +4,7 @@ import "./style.css";
 
 import thisStartsWithOneOfThese from "../../utils/finding";
 
-function Chat({ socket, displays, setDisplays, input, setInput, message, setMessage, inConversation, setConversation }) {
+function Chat({ socket, displays, setDisplays, input, setInput, message, setMessage, inConversation, setConversation, rooms, setRooms }) {
 
     // runs every time the message state is updated
     useEffect(() => {
@@ -20,7 +20,7 @@ function Chat({ socket, displays, setDisplays, input, setInput, message, setMess
                 const userTo = message.split(' ')[0];
                 const newMessage = message.split(' ').slice(1).join(' ');
 
-                socket.emit('whisper', { userTo, message: newMessage, username: Cookies.get('username') })
+                socket.emit('whisper', { userTo, message: newMessage, username: Cookies.get('username'), rooms })
             } else {
                 // if the inputted string doesn't start with a recognized command, this runs by default
                 socket.emit('chat message', { username: Cookies.get('username'), message })
@@ -32,6 +32,7 @@ function Chat({ socket, displays, setDisplays, input, setInput, message, setMess
 
     // socket.off is required cause react is stupid don't ask
     socket.off('join').on('join', function ({ room, userJoining }) {
+        if (userJoining === Cookies.get('username')) setRooms(rooms.concat(room));
         // keys are set via the time and received data to ensure that they're unique
         setDisplays(displays.concat(<li key={room + userJoining + new Date().getTime()}>{userJoining} joined {room}</li>))
     });

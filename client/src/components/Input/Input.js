@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Cookies from "js-cookie"
 import "./style.css"
 
 import thisStartsWithOneOfThese from "../../utils/finding";
 
-function Input({ setMessage, socket, inConversation, input, setInput }) {
+function Input({ setMessage, socket, inConversation, input, setInput, rooms, setRooms }) {
+
 
     function handleSubmit(e) {
         e.preventDefault();
         if (inConversation && !thisStartsWithOneOfThese(input.toLowerCase(), ['/w', 'whisper', 'say to', 'speak to', 'talk to'])) {
             console.log("shouldn't be here")
             // if the user is in a conversation with an NPC, emit to the server
-            socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input });
+            socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input, rooms });
             setInput('');
         } else {
             // the thisStartsWithOneOfThese function allows for multiple inputs to access a single command
