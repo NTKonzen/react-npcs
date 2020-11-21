@@ -38,6 +38,7 @@ function Chat({ socket, displays, setDisplays, input, setInput, message, setMess
     });
 
     socket.off('leave').on('leave', function ({ room, userLeaving }) {
+        if (userLeaving === Cookies.get('username')) setRooms(rooms.filter(r => r !== room));
         setDisplays(displays.concat(<li key={room + userLeaving + new Date().getTime()}>{userLeaving} left {room}</li>))
     });
 
