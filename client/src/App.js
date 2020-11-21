@@ -1,5 +1,5 @@
 // import logo from './logo.svg';
-import Chat from "./pages/Chat/Chat";
+import Play from "./pages/Play/Play";
 import SignUp from "./pages/SignUp/SignUp";
 import './App.css';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
@@ -13,7 +13,7 @@ function App() {
     <div className="App">
       <Router>
         <Route exact path='/'>
-          {Cookies.get('username') ? <Chat></Chat> : <Redirect to="/signup"></Redirect>}
+          {Cookies.get('username') ? <Play></Play> : <Redirect to="/signup"></Redirect>}
         </Route>
         <Route exact path='/signup'>
           {Cookies.get('username') ? <Redirect to="/"></Redirect> : <SignUp></SignUp>}

@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-var app = require('express')();
+var app = express();
 var server = require('http').createServer(app);
 const io = require('./config/io-config')(server);
 // const backEngine = require('./controllers/backEngine')(io);

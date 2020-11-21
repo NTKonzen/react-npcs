@@ -1,28 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import Cookies from "js-cookie";
 import "./style.css";
-// Cookie plugin makes cookies easy
-import Cookies from 'js-cookie';
-// I had to create a separate socket file to avoid users connecting to multiple sockets
-// this ensures there is only one socket instance per client
-import socket from '../../utils/socket';
 
-function thisStartsWithOneOfThese(string, array) {
-    let itDoes = false;
-    array.forEach(value => {
-        if (string.startsWith(value)) {
-            itDoes = true;
-        }
-    })
-    return itDoes;
-}
-function Chat() {
-    const [input, setInput] = useState('');
+import thisStartsWithOneOfThese from "../../utils/finding";
 
-    const [displays, setDisplays] = useState([]);
-
-    const [message, setMessage] = useState('');
-
-    const [inConversation, setConversation] = useState(false);
+function Chat({ socket, displays, setDisplays, input, setInput, message, setMessage, inConversation, setConversation }) {
 
     // runs every time the message state is updated
     useEffect(() => {
@@ -82,45 +64,12 @@ function Chat() {
     socket.off('error').on('error', function ({ err }) {
         setDisplays(displays.concat(<li key={err + new Date().getTime()}>{err}</li>))
     });
-
-    function handleChange(e) {
-        setInput(e.target.value);
-    };
-
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (inConversation && !thisStartsWithOneOfThese(input.toLowerCase(), ['/w', 'whisper', 'say to', 'speak to', 'talk to'])) {
-            // if the user is in a conversation with an NPC, emit to the server
-            socket.emit('whisper', { userTo: inConversation.with, username: Cookies.get('username'), message: input })
-            setInput('')
-        } else {
-            // the thisStartsWithOneOfThese function allows for multiple inputs to access a single command
-            if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
-                const room = input.split(' ').slice(1).join(' ');
-                setMessage(room);
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
-                const room = input.split(' ').slice(1).join(' ');
-                setMessage(room);
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to', 'talk to'])) {
-                // handles if the user is using the extended whisper command with 'to'
-                const whisperMessage = thisStartsWithOneOfThese(input.toLowerCase(), ['whisper to', 'say to', 'speak to', 'talk to']) ? input.split(' ').slice(2).join(' ') : input.split(' ').slice(1).join(' ');
-                setMessage(whisperMessage);
-            } else {
-                setMessage(input);
-            }
-        }
-    }
-
-    return (<div>
+    return (
         <ul id="messages">
             {displays.map(display => {
                 return display
             })}
         </ul>
-        <form action="" onSubmit={handleSubmit}>
-            <input id="m" autoComplete="off" onChange={handleChange} value={input} /><button>Send</button>
-        </form>
-    </div>
     )
 }
 
