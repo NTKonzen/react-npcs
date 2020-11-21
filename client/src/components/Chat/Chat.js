@@ -1,34 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Cookies from "js-cookie";
 import "./style.css";
 
 import thisStartsWithOneOfThese from "../../utils/finding";
 
 function Chat({ socket, displays, setDisplays, input, setInput, message, setMessage, inConversation, setConversation, rooms, setRooms }) {
-
-    // runs every time the message state is updated
-    useEffect(() => {
-        if (message !== '') {
-            if (thisStartsWithOneOfThese(input.toLowerCase(), ['join', '/j'])) {
-                // Example call: join room1
-                socket.emit('join', { room: message, username: Cookies.get('username') })
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['leave', '/l'])) {
-                // Example call: leave room1
-                socket.emit('leave', { room: message, username: Cookies.get('username') })
-            } else if (thisStartsWithOneOfThese(input.toLowerCase(), ['whisper', '/w', 'whisper to', 'say to', 'speak to', 'talk to'])) {
-                // Example call: /w Nick Hey!
-                const userTo = message.split(' ')[0];
-                const newMessage = message.split(' ').slice(1).join(' ');
-
-                socket.emit('whisper', { userTo, message: newMessage, username: Cookies.get('username'), rooms })
-            } else {
-                // if the inputted string doesn't start with a recognized command, this runs by default
-                socket.emit('chat message', { username: Cookies.get('username'), message })
-            }
-            setMessage("");
-            setInput("");
-        }
-    }, [message]);
 
     // socket.off is required cause react is stupid don't ask
     socket.off('join').on('join', function ({ room, userJoining }) {
