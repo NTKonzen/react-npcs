@@ -49,16 +49,18 @@ function Chat({ socket, displays, setDisplays, input, setInput, message, setMess
     });
 
     socket.off('from NPC').on('from NPC', function ({ NPCName, NPCMessage, exampleResponses, leavingConversation }) {
+
+        let npcElementArray = [<li key={NPCName + NPCMessage + new Date().getTime()}><b>{NPCName}: {NPCMessage}</b></li>]
+
         // the leavingConversation is determined in the NPCEngine
         if (!leavingConversation) {
+            npcElementArray.push(<li key={exampleResponses + new Date().getTime()}>Allowed Responses: {exampleResponses}</li>)
             setConversation({ with: NPCName.toLowerCase() })
         } else {
             setConversation(false)
         }
-        setDisplays(displays.concat([
-            <li key={NPCName + NPCMessage + new Date().getTime()}><b>{NPCName}: {NPCMessage}</b></li>,
-            <li key={exampleResponses + new Date().getTime()}>Allowed Responses: {exampleResponses}</li>
-        ]));
+
+        setDisplays(displays.concat(npcElementArray));
     })
 
     socket.off('error').on('error', function ({ err }) {
