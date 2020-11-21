@@ -11,6 +11,11 @@ function NPCChecks(message, rooms) {
             message = message.split(' ').slice(1).join(' ');
         }
 
+        // sets each room to its lowercase counterpart
+        rooms.forEach((value, index, array) => {
+            array[index] = value.toLowerCase();
+        })
+
         // This runs three times!
         for (let i = 2; i >= 0; i--) {
             const messageString = message.toLowerCase().split(' ').slice(0, i + 1).join(' ');
