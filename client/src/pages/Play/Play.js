@@ -11,33 +11,21 @@ function Play() {
 
     const [displays, setDisplays] = useState([]);
 
-    const [message, setMessage] = useState('');
-
     const [inConversation, setConversation] = useState(false);
 
     const [rooms, setRooms] = useState([])
-
-    useEffect(() => {
-        console.log(rooms)
-    }, [rooms])
 
     return (<div>
         <Chat
             socket={socket}
             displays={displays}
             setDisplays={setDisplays}
-            inConversation={inConversation}
-            setConversation={setConversation}
-            input={input}
-            setInput={setInput}
-            message={message}
-            setMessage={setMessage}
             rooms={rooms}
             setRooms={setRooms}
+            setConversation={setConversation}
         >
         </Chat>
         <Input
-            setMessage={setMessage}
             socket={socket}
             inConversation={inConversation}
             input={input}

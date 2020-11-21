@@ -4,7 +4,7 @@ import "./style.css";
 
 import thisStartsWithOneOfThese from "../../utils/finding";
 
-function Chat({ socket, displays, setDisplays, input, setInput, message, setMessage, inConversation, setConversation, rooms, setRooms }) {
+function Chat({ socket, displays, setDisplays, setConversation, rooms, setRooms }) {
 
     // socket.off is required cause react is stupid don't ask
     socket.off('join').on('join', function ({ room, userJoining }) {

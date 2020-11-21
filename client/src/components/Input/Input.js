@@ -4,7 +4,7 @@ import "./style.css"
 
 import thisStartsWithOneOfThese from "../../utils/finding";
 
-function Input({ setMessage, socket, inConversation, input, setInput, rooms, setRooms }) {
+function Input({ socket, inConversation, input, setInput, rooms, setRooms }) {
 
 
     function handleSubmit(e) {
